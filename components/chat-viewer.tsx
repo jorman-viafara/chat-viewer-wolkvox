@@ -66,9 +66,7 @@ export function ChatViewer({ messages, loading, hasSearched }: ChatViewerProps) 
       chat.totalMessages++
 
       const messageDate = new Date(message.date)
-      if (messageDate > chat.lastMessage) {
-        chat.lastMessage = messageDate
-      }
+      if (messageDate > chat.lastMessage) chat.lastMessage = messageDate
     })
 
     return Array.from(chatGroups.values())
@@ -120,66 +118,74 @@ export function ChatViewer({ messages, loading, hasSearched }: ChatViewerProps) 
     )
   }
 
-  // --- Vista de conversación estilo WhatsApp ---
+  // --- Modal de conversación mejorado ---
   if (activeChat) {
     return (
-      <Card className="shadow-xl border-0 bg-slate-900/95 backdrop-blur-md animate-fade-in h-[80vh] flex flex-col">
-        {/* Header tipo WhatsApp */}
-        <CardHeader className="flex items-center gap-4 bg-slate-800/80 p-4 border-b border-slate-700">
-          <button onClick={() => setActiveChat(null)} className="p-2 rounded-full hover:bg-slate-700/60">
-            <ArrowLeft className="h-5 w-5 text-blue-300" />
-          </button>
-          <Avatar className="h-12 w-12 bg-gradient-to-br from-blue-600 to-blue-700 shadow-md">
-            <AvatarFallback className="text-white font-bold">
-              {activeChat.customer_name.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1">
-            <CardTitle className="text-white text-lg">{activeChat.customer_name}</CardTitle>
-            <p className="text-blue-200/70 text-sm flex items-center gap-2">
-              <Phone className="h-3 w-3" /> {activeChat.customer_phone || "Sin teléfono"}
-            </p>
-          </div>
-        </CardHeader>
-
-        {/* Conversación */}
-        <CardContent className="flex-1 p-4 overflow-hidden">
-          <ScrollArea className="h-full pr-4">
-            <div className="flex flex-col space-y-4">
-              {activeChat.messages
-                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                .map((message, i) => (
-                  <div key={i} className="flex flex-col space-y-2">
-                    {message.customer_query && (
-                      <div className="flex justify-end">
-                        <div className="bg-green-600 text-white rounded-2xl rounded-br-md px-4 py-2 max-w-[70%] shadow-md">
-                          <p className="text-sm leading-relaxed">{message.customer_query}</p>
-                          <p className="text-[10px] opacity-70 text-right mt-1">
-                            {format(new Date(message.date), "HH:mm", { locale: es })}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                    {message.routing_answer && (
-                      <div className="flex justify-start">
-                        <div className="bg-slate-700 text-blue-100 rounded-2xl rounded-bl-md px-4 py-2 max-w-[70%] shadow-md">
-                          <p className="text-sm leading-relaxed">{message.routing_answer}</p>
-                          <p className="text-[10px] opacity-70 mt-1">
-                            {format(new Date(message.date), "HH:mm", { locale: es })}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+        onClick={() => setActiveChat(null)} // cerrar modal al hacer click afuera
+      >
+        <Card
+          className="shadow-xl border-0 bg-slate-900/95 backdrop-blur-md animate-fade-in h-[85vh] w-[95%] max-w-5xl flex flex-col rounded-2xl"
+          onClick={(e) => e.stopPropagation()} // evita cierre al click dentro
+        >
+          {/* Header */}
+          <CardHeader className="flex items-center gap-4 bg-slate-800/80 p-5 border-b border-slate-700 rounded-t-2xl">
+            <button onClick={() => setActiveChat(null)} className="p-2 rounded-full hover:bg-slate-700/60">
+              <ArrowLeft className="h-5 w-5 text-blue-300" />
+            </button>
+            <Avatar className="h-12 w-12 bg-gradient-to-br from-blue-600 to-blue-700 shadow-md">
+              <AvatarFallback className="text-white font-bold">
+                {activeChat.customer_name.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <CardTitle className="text-white text-lg">{activeChat.customer_name}</CardTitle>
+              <p className="text-blue-200/70 text-sm flex items-center gap-2">
+                <Phone className="h-3 w-3" /> {activeChat.customer_phone || "Sin teléfono"}
+              </p>
             </div>
-          </ScrollArea>
-        </CardContent>
-      </Card>
+          </CardHeader>
+
+          {/* Conversación */}
+          <CardContent className="flex-1 p-6 overflow-hidden">
+            <ScrollArea className="h-full pr-4">
+              <div className="flex flex-col space-y-5">
+                {activeChat.messages
+                  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                  .map((message, i) => (
+                    <div key={i} className="flex flex-col space-y-3">
+                      {message.customer_query && (
+                        <div className="flex justify-end">
+                          <div className="bg-green-600 text-white rounded-2xl rounded-br-md px-5 py-3 max-w-[70%] shadow-md">
+                            <p className="text-sm leading-relaxed">{message.customer_query}</p>
+                            <p className="text-[10px] opacity-70 text-right mt-1">
+                              {format(new Date(message.date), "HH:mm", { locale: es })}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      {message.routing_answer && (
+                        <div className="flex justify-start">
+                          <div className="bg-slate-700 text-blue-100 rounded-2xl rounded-bl-md px-5 py-3 max-w-[70%] shadow-md">
+                            <p className="text-sm leading-relaxed">{message.routing_answer}</p>
+                            <p className="text-[10px] opacity-70 mt-1">
+                              {format(new Date(message.date), "HH:mm", { locale: es })}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 
-  // --- Lista de chats (inbox) ---
+  // --- Lista de chats ---
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between p-6 bg-slate-800/50 border border-blue-600/30 backdrop-blur-sm rounded-2xl shadow-lg">
@@ -194,14 +200,14 @@ export function ChatViewer({ messages, loading, hasSearched }: ChatViewerProps) 
         </Badge>
       </div>
 
-      {/* Input de filtro siempre visible */}
+      {/* Input de filtro */}
       <div className="mb-6">
         <input
           type="text"
           placeholder="Filtrar por número..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="w-full px-4 py-2 border border-slate-700 rounded-lg bg-slate-800 text-white placeholder-blue-300/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-3 border border-slate-700 rounded-lg bg-slate-800 text-white placeholder-blue-300/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
@@ -215,7 +221,7 @@ export function ChatViewer({ messages, loading, hasSearched }: ChatViewerProps) 
             <Card
               key={chat.id}
               onClick={() => setActiveChat(chat)}
-              className="cursor-pointer shadow-xl border-blue-600/30 bg-slate-800/50 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02] animate-fade-in-up group hover:bg-slate-800/70"
+              className="cursor-pointer shadow-xl border-blue-600/30 bg-slate-800/50 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 hover:scale-[1.02] animate-fade-in-up group hover:bg-slate-800/70"
               style={{ animationDelay: `${index * 150}ms` }}
             >
               <CardHeader className="pb-4">
