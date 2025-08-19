@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Search, Calendar, Activity, Building } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import { isSameMonth } from "date-fns"
+import ComponentInfoDev from "./infoDevs"
 
 // Interfaces
 interface ChatMessage {
@@ -180,6 +181,8 @@ export default function WolkvoxChatViewer() {
       </div>
 
       <div className="relative z-20 container mx-auto px-4 py-8 max-w-7xl">
+        <br />
+        <br />
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in">
           <div className="flex items-center justify-center gap-4 mb-6">
@@ -268,6 +271,17 @@ export default function WolkvoxChatViewer() {
           <ChatViewer messages={chatData} loading={loading} hasSearched={hasSearched} />
         </div>
       </div>
+
+      < ComponentInfoDev
+        nombreDesarrollador="@JormanDev"
+        especialidad="Backend Developer"
+        correo="jorman.viafara@bluelinkbpo.com.co"
+        empresa="Bluelink BPO"
+        area="TI"
+        posicionBoton="right-4"
+        cargo="Analista de Implementacion"
+      />
+
     </div>
   )
 }
