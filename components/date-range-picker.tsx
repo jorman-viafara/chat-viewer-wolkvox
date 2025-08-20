@@ -80,20 +80,20 @@ export function DateRangePicker({ dateRange, onDateRangeChange }: DateRangePicke
             variant="outline"
             className={cn(
               "w-full justify-start text-left font-normal transition-all duration-300",
-              "bg-slate-800/90 border-blue-400/70 text-blue-50 hover:bg-blue-700/40 hover:border-blue-300",
+              "bg-slate-700/50 border border-blue-600/50 text-white hover:bg-blue-700/40 hover:border-blue-300",
               "backdrop-blur-sm shadow-lg shadow-blue-900/20",
               !dateRange.from && "text-blue-100/80",
               "glass-effect hover:shadow-xl hover:shadow-blue-500/30",
             )}
           >
-            <CalendarIcon className="mr-2 h-4 w-4 text-blue-200" />
+            <CalendarIcon className="mr-2 h-4 w-4 text-blue-400" />
             {dateRange.from ? (
               dateRange.to ? (
-                <span className="text-blue-50 font-medium">
+                <span className="text-white font-medium">
                   {safeFormat(dateRange.from, "dd/MM/yyyy")} - {safeFormat(dateRange.to, "dd/MM/yyyy")}
                 </span>
               ) : (
-                <span className="text-blue-50 font-medium">{safeFormat(dateRange.from, "dd/MM/yyyy")}</span>
+                <span className="text-white font-medium">{safeFormat(dateRange.from, "dd/MM/yyyy")}</span>
               )
             ) : (
               <span className="text-blue-100/80">Selecciona un rango de fechas</span>
@@ -101,13 +101,13 @@ export function DateRangePicker({ dateRange, onDateRangeChange }: DateRangePicke
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-auto p-0 shadow-2xl border-0 glass-card animate-fade-in"
+          className="w-auto p-0 shadow-2xl border-0 bg-slate-700/50 glass-card animate-fade-in"
           align="start"
           style={{ zIndex: 10000 }}
         >
-          <div className="p-4 border-b border-blue-600/30 bg-gradient-to-r from-blue-600/10 to-cyan-600/10">
-            <div className="flex items-center gap-2 text-sm text-blue-50">
-              <MousePointer className="h-4 w-4 text-blue-300" />
+          <div className="p-4 border-b border-blue-600/50 bg-gradient-to-r from-blue-600/10 to-cyan-600/10">
+            <div className="flex items-center gap-2 text-sm text-blue-200">
+              <MousePointer className="h-4 w-4 text-blue-400" />
               <span>Selecciona fecha inicial y final</span>
             </div>
             <div className="flex items-center gap-2 text-xs text-blue-100/80 mt-1">
@@ -123,7 +123,7 @@ export function DateRangePicker({ dateRange, onDateRangeChange }: DateRangePicke
             onSelect={handleDateSelect}
             numberOfMonths={2}
             locale={es}
-            className="rounded-lg bg-slate-900/40 backdrop-blur-sm"
+            className="rounded-lg bg-slate-700/50 backdrop-blur-sm"
           />
         </PopoverContent>
       </Popover>

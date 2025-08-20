@@ -38,6 +38,28 @@ interface GroupedChat {
   totalMessages: number
 }
 
+// Función para mostrar etiquetas de fecha tipo WhatsApp
+function formatChatDate(date: Date): string {
+  const today = new Date()
+  const yesterday = new Date()
+  yesterday.setDate(today.getDate() - 1)
+
+  const isToday =
+    date.getDate() === today.getDate() &&
+    date.getMonth() === today.getMonth() &&
+    date.getFullYear() === today.getFullYear()
+
+  const isYesterday =
+    date.getDate() === yesterday.getDate() &&
+    date.getMonth() === yesterday.getMonth() &&
+    date.getFullYear() === yesterday.getFullYear()
+
+  if (isToday) return "Hoy"
+  if (isYesterday) return "Ayer"
+
+  return format(date, "dd/MM/yyyy", { locale: es })
+}
+
 export function ChatViewer({ messages, loading, hasSearched }: ChatViewerProps) {
   const [activeChat, setActiveChat] = useState<GroupedChat | null>(null)
   const [filter, setFilter] = useState("")
@@ -118,16 +140,16 @@ export function ChatViewer({ messages, loading, hasSearched }: ChatViewerProps) 
     )
   }
 
-  // --- Modal de conversación mejorado ---
+  // --- Modal de conversación con separadores de fecha ---
   if (activeChat) {
     return (
       <div
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-        onClick={() => setActiveChat(null)} // cerrar modal al hacer click afuera
+        onClick={() => setActiveChat(null)}
       >
         <Card
           className="shadow-xl border-0 bg-slate-900/95 backdrop-blur-md animate-fade-in h-[85vh] w-[95%] max-w-5xl flex flex-col rounded-2xl"
-          onClick={(e) => e.stopPropagation()} // evita cierre al click dentro
+          onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <CardHeader className="flex items-center gap-4 bg-slate-800/80 p-5 border-b border-slate-700 rounded-t-2xl">
@@ -147,36 +169,55 @@ export function ChatViewer({ messages, loading, hasSearched }: ChatViewerProps) 
             </div>
           </CardHeader>
 
-          {/* Conversación */}
+          {/* Conversación con separadores */}
           <CardContent className="flex-1 p-6 overflow-hidden">
             <ScrollArea className="h-full pr-4">
               <div className="flex flex-col space-y-5">
                 {activeChat.messages
                   .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                  .map((message, i) => (
-                    <div key={i} className="flex flex-col space-y-3">
-                      {message.customer_query && (
-                        <div className="flex justify-end">
+                  .reduce<JSX.Element[]>((acc, message, i, arr) => {
+                    const messageDate = new Date(message.date)
+                    const prevMessageDate = i > 0 ? new Date(arr[i - 1].date) : null
+
+                    // Separador de fecha si cambia respecto al mensaje anterior
+                    if (!prevMessageDate || messageDate.toDateString() !== prevMessageDate.toDateString()) {
+                      acc.push(
+                        <div key={`sep-${i}`} className="flex justify-center my-2">
+                          <span className="bg-slate-700/70 text-blue-200 px-3 py-1 rounded-full text-xs font-semibold">
+                            {formatChatDate(messageDate)}
+                          </span>
+                        </div>
+                      )
+                    }
+
+                    if (message.customer_query) {
+                      acc.push(
+                        <div key={`c-${i}`} className="flex justify-end">
                           <div className="bg-green-600 text-white rounded-2xl rounded-br-md px-5 py-3 max-w-[70%] shadow-md">
                             <p className="text-sm leading-relaxed">{message.customer_query}</p>
                             <p className="text-[10px] opacity-70 text-right mt-1">
-                              {format(new Date(message.date), "HH:mm", { locale: es })}
+                              {format(messageDate, "HH:mm", { locale: es })}
                             </p>
                           </div>
                         </div>
-                      )}
-                      {message.routing_answer && (
-                        <div className="flex justify-start">
+                      )
+                    }
+
+                    if (message.routing_answer) {
+                      acc.push(
+                        <div key={`r-${i}`} className="flex justify-start">
                           <div className="bg-slate-700 text-blue-100 rounded-2xl rounded-bl-md px-5 py-3 max-w-[70%] shadow-md">
                             <p className="text-sm leading-relaxed">{message.routing_answer}</p>
                             <p className="text-[10px] opacity-70 mt-1">
-                              {format(new Date(message.date), "HH:mm", { locale: es })}
+                              {format(messageDate, "HH:mm", { locale: es })}
                             </p>
                           </div>
                         </div>
-                      )}
-                    </div>
-                  ))}
+                      )
+                    }
+
+                    return acc
+                  }, [])}
               </div>
             </ScrollArea>
           </CardContent>
@@ -200,7 +241,6 @@ export function ChatViewer({ messages, loading, hasSearched }: ChatViewerProps) 
         </Badge>
       </div>
 
-      {/* Input de filtro */}
       <div className="mb-6">
         <input
           type="text"
